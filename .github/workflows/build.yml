@@ -7,6 +7,10 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: ./sudoku-android
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,6 +24,7 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
+        cache-dependency-path: ./sudoku-android/package-lock.json
     
     - name: Install dependencies
       run: npm ci
@@ -40,14 +45,14 @@ jobs:
       uses: android-actions/setup-android@v2
     
     - name: Build Debug APK
-      working-directory: ./android
+      working-directory: ./sudoku-android/android
       run: ./gradlew assembleDebug
     
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
         name: sudoku-debug-apk
-        path: android/app/build/outputs/apk/debug/app-debug.apk
+        path: sudoku-android/android/app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
     
     - name: Create Release
@@ -56,7 +61,7 @@ jobs:
       with:
         tag_name: v${{ github.run_number }}
         name: Release v${{ github.run_number }}
-        files: android/app/build/outputs/apk/debug/app-debug.apk
+        files: sudoku-android/android/app/build/outputs/apk/debug/app-debug.apk
         draft: false
         prerelease: false
       env:
