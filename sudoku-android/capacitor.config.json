@@ -1,0 +1,10 @@
+{
+  "appId": "com.yourcompany.sudoku",
+  "appName": "Sudoku Master",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  }
+}
