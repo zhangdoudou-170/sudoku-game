@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <title>数独大师</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div class="login-screen" id="loginScreen">
+        <h1>🎯 数独大师</h1>
+        <p class="subtitle">挑战你的逻辑思维</p>
+        
+        <div class="login-form">
+            <div class="input-group">
+                <label for="playerName">输入你的名字</label>
+                <input type="text" id="playerName" placeholder="例如: 小明" maxlength="10">
+            </div>
+            <button class="btn btn-primary" onclick="startGame()">开始游戏</button>
+        </div>
+
+        <div class="theme-selector">
+            <button class="theme-btn theme-neon active" data-theme="neon" onclick="selectTheme('neon')" title="霓虹"></button>
+            <button class="theme-btn theme-ocean" data-theme="ocean" onclick="selectTheme('ocean')" title="海洋"></button>
+            <button class="theme-btn theme-forest" data-theme="forest" onclick="selectTheme('forest')" title="森林"></button>
+            <button class="theme-btn theme-sunset" data-theme="sunset" onclick="selectTheme('sunset')" title="日落"></button>
+            <button class="theme-btn theme-dark" data-theme="dark" onclick="selectTheme('dark')" title="暗黑"></button>
+            <button class="theme-btn theme-pink" data-theme="pink" onclick="selectTheme('pink')" title="粉色"></button>
+        </div>
+        <p class="theme-label">选择你喜欢的主题</p>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div class="game-screen" id="gameScreen">
+        <div class="container">
+            <div class="header">
+                <div class="welcome-text">欢迎, <span id="displayName">玩家</span>!</div>
+                <div class="header-buttons">
+                    <button class="btn btn-secondary" onclick="showLeaderboard()">排行榜</button>
+                    <button class="btn btn-secondary" onclick="changeTheme()">主题</button>
+                    <button class="btn btn-secondary" onclick="logout()">退出</button>
+                </div>
+            </div>
+
+            <div class="personal-best">
+                <div class="personal-best-title">你的最佳成绩</div>
+                <div class="personal-best-grid">
+                    <div class="personal-best-item"><span class="personal-best-difficulty">简单</span><span class="personal-best-time" id="best-easy">-</span></div>
+                    <div class="personal-best-item"><span class="personal-best-difficulty">中等</span><span class="personal-best-time" id="best-medium">-</span></div>
+                    <div class="personal-best-item"><span class="personal-best-difficulty">困难</span><span class="personal-best-time" id="best-hard">-</span></div>
+                    <div class="personal-best-item"><span class="personal-best-difficulty">专家</span><span class="personal-best-time" id="best-expert">-</span></div>
+                </div>
+            </div>
+
+            <div class="game-info">
+                <div class="info-item"><span class="info-label">时间</span><span class="info-value" id="timer">00:00</span></div>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" data-diff="easy" onclick="setDifficulty('easy')">简单</button>
+                    <button class="difficulty-btn" data-diff="medium" onclick="setDifficulty('medium')">中等</button>
+                    <button class="difficulty-btn" data-diff="hard" onclick="setDifficulty('hard')">困难</button>
+                    <button class="difficulty-btn" data-diff="expert" onclick="setDifficulty('expert')">专家</button>
+                </div>
+            </div>
+
+            <div class="sudoku-board" id="board"></div>
+
+            <div class="number-pad">
+                <button class="number-btn" onclick="inputNumber(1)">1</button>
+                <button class="number-btn" onclick="inputNumber(2)">2</button>
+                <button class="number-btn" onclick="inputNumber(3)">3</button>
+                <button class="number-btn" onclick="inputNumber(4)">4</button>
+                <button class="number-btn" onclick="inputNumber(5)">5</button>
+                <button class="number-btn" onclick="inputNumber(6)">6</button>
+                <button class="number-btn" onclick="inputNumber(7)">7</button>
+                <button class="number-btn" onclick="inputNumber(8)">8</button>
+                <button class="number-btn" onclick="inputNumber(9)">9</button>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn" onclick="useHint()">提示</button>
+                <button class="control-btn" onclick="checkSolution()">检查</button>
+                <button class="control-btn" onclick="clearCell()">清除</button>
+                <button class="control-btn" onclick="newGame()">新游戏</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 排行榜弹窗 -->
+    <div class="modal" id="leaderboardModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">排行榜</h2>
+                <button class="close-btn" onclick="closeLeaderboard()">&times;</button>
+            </div>
+            <div class="leaderboard-tabs">
+                <button class="tab-btn active" data-tab="easy" onclick="switchTab('easy')">简单</button>
+                <button class="tab-btn" data-tab="medium" onclick="switchTab('medium')">中等</button>
+                <button class="tab-btn" data-tab="hard" onclick="switchTab('hard')">困难</button>
+                <button class="tab-btn" data-tab="expert" onclick="switchTab('expert')">专家</button>
+            </div>
+            <ul class="leaderboard-list" id="leaderboardList"></ul>
+        </div>
+    </div>
+
+    <!-- 完成弹窗 -->
+    <div class="modal" id="victoryModal">
+        <div class="modal-content victory-content">
+            <div class="victory-icon">🎉</div>
+            <h2 class="victory-title">恭喜完成!</h2>
+            <div class="victory-time" id="victoryTime"></div>
+            <p id="victoryMessage"></p>
+            <div class="victory-buttons">
+                <button class="btn btn-primary" onclick="recordScore()">记录成绩</button>
+                <button class="btn btn-secondary" onclick="closeVictory(); newGame();">再来一局</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主题选择弹窗 -->
+    <div class="modal" id="themeModal">
+        <div class="modal-content victory-content">
+            <h2 class="modal-title">选择主题</h2>
+            <div class="theme-selector" style="margin: 30px 0;">
+                <button class="theme-btn theme-neon" data-theme="neon" onclick="applyTheme('neon')"></button>
+                <button class="theme-btn theme-ocean" data-theme="ocean" onclick="applyTheme('ocean')"></button>
+                <button class="theme-btn theme-forest" data-theme="forest" onclick="applyTheme('forest')"></button>
+                <button class="theme-btn theme-sunset" data-theme="sunset" onclick="applyTheme('sunset')"></button>
+                <button class="theme-btn theme-dark" data-theme="dark" onclick="applyTheme('dark')"></button>
+                <button class="theme-btn theme-pink" data-theme="pink" onclick="applyTheme('pink')"></button>
+            </div>
+            <button class="btn btn-secondary" onclick="closeThemeModal()">关闭</button>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
